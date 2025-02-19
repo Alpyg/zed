@@ -15,9 +15,9 @@ pub fn main() !u8 {
     while (std.io.getStdIn().read(&c) catch unreachable == 1 and c[0] != 'q') {
         var out = std.io.getStdOut().writer();
         if (ascii.isControl(c[0])) {
-            try out.print("{d}\n", .{c});
+            try out.print("{d}\r\n", .{c});
         } else {
-            try out.print("{d} ({c})\n", .{ c, c });
+            try out.print("{d} ({c})\r\n", .{ c, c });
         }
     }
 
@@ -30,6 +30,8 @@ fn enableRawMode() void {
 
     termios.iflag.ICRNL = false;
     termios.iflag.IXON = false;
+
+    termios.oflag.OPOST = false;
 
     termios.lflag.ECHO = false;
     termios.lflag.ICANON = false;
