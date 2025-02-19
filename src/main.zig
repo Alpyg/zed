@@ -29,6 +29,7 @@ fn enableRawMode() void {
     var termios = original_termios;
     termios.lflag.ECHO = false;
     termios.lflag.ICANON = false;
+    termios.lflag.ISIG = false;
     posix.tcsetattr(posix.STDIN_FILENO, posix.TCSA.FLUSH, termios) catch unreachable;
 }
 
