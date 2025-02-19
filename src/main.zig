@@ -13,7 +13,7 @@ pub fn main() !u8 {
 
     while (true) {
         var c: [1]u8 = .{0};
-        _ = try std.io.getStdIn().read(&c);
+        _ = std.io.getStdIn().read(&c) catch die("read");
         var out = std.io.getStdOut().writer();
         if (ascii.isControl(c[0])) {
             try out.print("{d}\r\n", .{c});
@@ -30,7 +30,7 @@ pub fn main() !u8 {
 }
 
 fn enableRawMode() void {
-    original_termios = posix.tcgetattr(posix.STDIN_FILENO) catch unreachable;
+    original_termios = posix.tcgetattr(posix.STDIN_FILENO) catch die("tcgetattr");
     var termios = original_termios;
 
     termios.iflag.BRKINT = false;
@@ -49,9 +49,14 @@ fn enableRawMode() void {
     termios.cc[@intFromEnum(posix.V.MIN)] = 0;
     termios.cc[@intFromEnum(posix.V.TIME)] = 1;
 
-    posix.tcsetattr(posix.STDIN_FILENO, posix.TCSA.FLUSH, termios) catch unreachable;
+    posix.tcsetattr(posix.STDIN_FILENO, posix.TCSA.FLUSH, termios) catch die("tcsetattr");
 }
 
 fn disableRawMode() void {
-    posix.tcsetattr(posix.STDIN_FILENO, posix.TCSA.FLUSH, original_termios) catch unreachable;
+    posix.tcsetattr(posix.STDIN_FILENO, posix.TCSA.FLUSH, original_termios) catch die("tcsetattr");
+}
+
+fn die(s: []const u8) noreturn {
+    std.debug.print("{s}", .{s});
+    std.posix.exit(1);
 }
