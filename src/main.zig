@@ -11,13 +11,18 @@ pub fn main() !u8 {
     enableRawMode();
     defer disableRawMode();
 
-    var c: [1]u8 = .{0};
-    while (std.io.getStdIn().read(&c) catch unreachable == 1 and c[0] != 'q') {
+    while (true) {
+        var c: [1]u8 = .{0};
+        _ = try std.io.getStdIn().read(&c);
         var out = std.io.getStdOut().writer();
         if (ascii.isControl(c[0])) {
             try out.print("{d}\r\n", .{c});
         } else {
             try out.print("{d} ({c})\r\n", .{ c, c });
+        }
+
+        if (c[0] == 'q') {
+            break;
         }
     }
 
@@ -40,6 +45,9 @@ fn enableRawMode() void {
     termios.lflag.ICANON = false;
     termios.lflag.IEXTEN = false;
     termios.lflag.ISIG = false;
+
+    termios.cc[@intFromEnum(posix.V.MIN)] = 0;
+    termios.cc[@intFromEnum(posix.V.TIME)] = 1;
 
     posix.tcsetattr(posix.STDIN_FILENO, posix.TCSA.FLUSH, termios) catch unreachable;
 }
