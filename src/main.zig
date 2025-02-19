@@ -1,5 +1,6 @@
 const std = @import("std");
 
+const ascii = std.ascii;
 const posix = std.posix;
 
 const lib = @import("zed_lib");
@@ -11,7 +12,15 @@ pub fn main() !u8 {
     defer disableRawMode();
 
     var c: [1]u8 = .{0};
-    while (std.io.getStdIn().read(&c) catch unreachable == 1 and c[0] != 'q') {}
+    while (std.io.getStdIn().read(&c) catch unreachable == 1 and c[0] != 'q') {
+        var out = std.io.getStdOut().writer();
+        if (ascii.isControl(c[0])) {
+            try out.print("{d}\n", .{c});
+        } else {
+            try out.print("{d} ({c})\n", .{ c, c });
+        }
+    }
+
     return 0;
 }
 
