@@ -41,6 +41,7 @@ fn editorReadKey() [1]u8 {
 
 fn editorRefreshScreen() void {
     _ = std.io.getStdOut().writer().write("\x1b[2J") catch unreachable;
+    _ = std.io.getStdOut().writer().write("\x1b[H") catch unreachable;
 }
 
 fn enableRawMode() void {
