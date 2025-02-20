@@ -23,7 +23,11 @@ fn editorProcessKeypress() void {
     const c: [1]u8 = editorReadKey();
 
     switch (c[0]) {
-        'q' & 0x1f => std.posix.exit(0),
+        'q' & 0x1f => {
+            _ = std.io.getStdOut().writer().write("\x1b[2J") catch unreachable;
+            _ = std.io.getStdOut().writer().write("\x1b[H") catch unreachable;
+            std.posix.exit(0);
+        },
         else => {},
     }
 }
@@ -72,6 +76,8 @@ fn disableRawMode() void {
 }
 
 fn die(s: []const u8) noreturn {
+    _ = std.io.getStdOut().writer().write("\x1b[2J") catch unreachable;
+    _ = std.io.getStdOut().writer().write("\x1b[H") catch unreachable;
     std.debug.print("{s}", .{s});
     std.posix.exit(1);
 }
