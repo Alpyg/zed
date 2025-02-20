@@ -12,6 +12,7 @@ pub fn main() !u8 {
     defer disableRawMode();
 
     while (true) {
+        editorRefreshScreen();
         editorProcessKeypress();
     }
 
@@ -36,6 +37,10 @@ fn editorReadKey() [1]u8 {
         if (len != -1) break;
     }
     return c;
+}
+
+fn editorRefreshScreen() void {
+    _ = std.io.getStdOut().writer().write("\x1b[2J") catch unreachable;
 }
 
 fn enableRawMode() void {
