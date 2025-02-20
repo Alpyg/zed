@@ -12,19 +12,30 @@ pub fn main() !u8 {
     defer disableRawMode();
 
     while (true) {
-        var c: [1]u8 = .{0};
-        _ = std.io.getStdIn().read(&c) catch die("read");
-        var out = std.io.getStdOut().writer();
-        if (ascii.isControl(c[0])) {
-            try out.print("{d}\r\n", .{c});
-        } else {
-            try out.print("{d} ({c})\r\n", .{ c, c });
-        }
-
-        if (c[0] == 'q' & 0x1f) break;
+        editorProcessKeypress();
     }
 
     return 0;
+}
+
+fn editorProcessKeypress() void {
+    const c: [1]u8 = editorReadKey();
+
+    switch (c[0]) {
+        'q' & 0x1f => std.posix.exit(0),
+        else => {},
+    }
+}
+
+fn editorReadKey() [1]u8 {
+    var c: [1]u8 = undefined;
+    var len: usize = undefined;
+
+    while (true) {
+        len = std.io.getStdIn().read(&c) catch die("read");
+        if (len != -1) break;
+    }
+    return c;
 }
 
 fn enableRawMode() void {
