@@ -21,9 +21,7 @@ pub fn main() !u8 {
             try out.print("{d} ({c})\r\n", .{ c, c });
         }
 
-        if (c[0] == 'q') {
-            break;
-        }
+        if (c[0] == 'q' & 0x1f) break;
     }
 
     return 0;
